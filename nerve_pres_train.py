@@ -1,3 +1,5 @@
+#This script learn to predict the presence or absence of the BP
+
 import os
 import numpy as np
 import theano
