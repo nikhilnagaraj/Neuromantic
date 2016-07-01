@@ -376,7 +376,7 @@ def train():
 #    val_pres_fn = theano.function([input_var, mask_presence_var], mask_pres_loss)
     
 
-    num_epochs=20
+    num_epochs=25
     train_batchsize=32
     val_batchsize = 32
     #best_mask_val_score = 99.99
