@@ -87,22 +87,24 @@ def load_patient_data(filepath, num_patients, num_images):
                 img_masks.append(img_mask)
                 
                 #Augment data
-                trans_imgs, trans_img_masks = augment_data(img,img_mask,patient_idx,image_idx)
-                for trans_img in trans_imgs:
-                    imgs.append(trans_img)
-                for trans_img_mask in trans_img_masks: 
-                    img_masks.append(trans_img_mask)             
-                print "patient {}: loaded image {}".format(patient_idx+1,image_idx+1)
-                prev_img = img
-                prev_mask = img_mask
+                # trans_imgs, trans_img_masks = augment_data(img,img_mask,patient_idx,image_idx)
+                # for trans_img in trans_imgs:
+                #     imgs.append(trans_img)
+                # for trans_img_mask in trans_img_masks: 
+                #     img_masks.append(trans_img_mask)             
+                # print "patient {}: loaded image {}".format(patient_idx+1,image_idx+1)
+                # prev_img = img
+                # prev_mask = img_mask
             except:
-                imgs.append(prev_img)
-                img_masks.append(prev_mask)
-                trans_imgs, trans_img_mask = augment_data(prev_img,prev_mask,patient_idx,image_idx)
-                for trans_img in trans_imgs:
-                    imgs.append(trans_img)
-                for trans_img_mask in trans_img_masks: 
-                    img_masks.append(trans_img_mask)  
+                # imgs.append(prev_img)
+                # img_masks.append(prev_mask)
+                
+                # trans_imgs, trans_img_mask = augment_data(prev_img,prev_mask,patient_idx,image_idx) 
+                # for trans_img in trans_imgs:
+                #     imgs.append(trans_img)
+                # for trans_img_mask in trans_img_masks: 
+                #     img_masks.append(trans_img_mask) 
+                    
                 print "patient {}: image or mask {} not found, skipping".format(patient_idx+1,image_idx+1)
           
     print "Augmented Training data stats : {} images have been loaded".format(len(imgs))
@@ -335,17 +337,22 @@ def train():
     img_masks /= 255.
 
     #Split into training and validation data
-    #val_patients = 5
+    val_patients = 10
 
     test_num = 705 * 4
     num_train = 4935 * 4
     
-    X_train , X_val = per_patient_train_val_split(imgs , num_train , test_num , num_patients)
-    y_train , y_val = per_patient_train_val_split(img_masks , num_train , test_num, num_patients)
+#    X_train , X_val = per_patient_train_val_split(imgs , num_train , test_num , num_patients)
+#    y_train , y_val = per_patient_train_val_split(img_masks , num_train , test_num, num_patients)
 
 
-    #X_train, X_val = imgs[:-(val_patients*num_images*4)], imgs[-(val_patients*num_images*4):] 
-    #y_train, y_val = img_masks[:-(val_patients*num_images*4)], img_masks[-(val_patients*num_images*4):]
+    X_train, X_val = imgs[:-(val_patients*num_images)],imgs[-(val_patients*num_images):] 
+    y_train, y_val = img_masks[:-(val_patients*num_images)], img_masks[-(val_patients*num_images):]
+
+    # X_train, X_val = imgs[:-(val_patients*num_images*4)],imgs[-(val_patients*num_images*4):] 
+    # y_train, y_val = img_masks[:-(val_patients*num_images*4)], img_masks[-(val_patients*num_images*4):]
+
+
     #X_train = imgs
     #y_train = img_masks
 

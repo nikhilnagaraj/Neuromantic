@@ -110,97 +110,97 @@ def load_test_images(filepath, num_images):
     imgs = np.array(imgs).reshape(-1, 1, 420, 580)
     return imgs
 
-def build_inception_module(name,input_layer, num_filters):
+# def build_inception_module(name,input_layer, num_filters):
 
-#   name = Name of the inception module
-#   input_layer = THe layer that is to be taken as the input
-#   num_filters = An array consisting of num of filters for each module
-    net = {}
-    net['pool'] = PoolLayerDNN(input_layer, pool_size=3, stride=1, pad=1)
-    net['pool_proj'] = ConvLayer(
-        net['pool'], num_filters[0], 1, flip_filters=False)
+# #   name = Name of the inception module
+# #   input_layer = THe layer that is to be taken as the input
+# #   num_filters = An array consisting of num of filters for each module
+#     net = {}
+#     net['pool'] = PoolLayerDNN(input_layer, pool_size=3, stride=1, pad=1)
+#     net['pool_proj'] = ConvLayer(
+#         net['pool'], num_filters[0], 1, flip_filters=False)
 
-    net['1x1'] = ConvLayer(input_layer, num_filters[1], 1, flip_filters=False)
+#     net['1x1'] = ConvLayer(input_layer, num_filters[1], 1, flip_filters=False)
 
-    net['3x3_reduce'] = ConvLayer(
-        input_layer, num_filters[2], 1, flip_filters=False)
-    net['3x3'] = ConvLayer(
-        net['3x3_reduce'], num_filters[3], 3, pad=1, flip_filters=False)
+#     net['3x3_reduce'] = ConvLayer(
+#         input_layer, num_filters[2], 1, flip_filters=False)
+#     net['3x3'] = ConvLayer(
+#         net['3x3_reduce'], num_filters[3], 3, pad=1, flip_filters=False)
 
-    net['5x5_reduce'] = ConvLayer(
-        input_layer, num_filters[4], 1, flip_filters=False)
-    net['5x5'] = ConvLayer(
-        net['5x5_reduce'], num_filters[5], 5, pad=2, flip_filters=False)
+#     net['5x5_reduce'] = ConvLayer(
+#         input_layer, num_filters[4], 1, flip_filters=False)
+#     net['5x5'] = ConvLayer(
+#         net['5x5_reduce'], num_filters[5], 5, pad=2, flip_filters=False)
 
-    net['output'] = ConcatLayer([
-        net['1x1'],
-        net['3x3'],
-        net['5x5'],
-        net['pool_proj'],
-        ])
+#     net['output'] = ConcatLayer([
+#         net['1x1'],
+#         net['3x3'],
+#         net['5x5'],
+#         net['pool_proj'],
+#         ])
 
-    return {'{}/{}'.format(name, k): v for k, v in net.items()}
+#     return {'{}/{}'.format(name, k): v for k, v in net.items()}
 
 
-def pres_network(input_var=None):
+# def pres_network(input_var=None):
 
-    net = {}
-    net['input'] = InputLayer((None, 1, img_rows, img_cols),input_var=input_var)
-    net['conv1/7x7_s2'] = ConvLayer(
-        net['input'], 64, 7, stride=2, pad=3, flip_filters=False)
-    net['pool1/3x3_s2'] = PoolLayer(
-        net['conv1/7x7_s2'], pool_size=3, stride=2, ignore_border=False)
-    net['pool1/norm1'] = LRNLayer(net['pool1/3x3_s2'], alpha=0.00002, k=1)
-    net['conv2/3x3_reduce'] = ConvLayer(
-        net['pool1/norm1'], 64, 1, flip_filters=False)
-    net['conv2/3x3'] = ConvLayer(
-        net['conv2/3x3_reduce'], 192, 3, pad=1, flip_filters=False)
-    net['conv2/norm2'] = LRNLayer(net['conv2/3x3'], alpha=0.00002, k=1)
-    net['pool2/3x3_s2'] = PoolLayer(
-      net['conv2/norm2'], pool_size=3, stride=2, ignore_border=False)
+#     net = {}
+#     net['input'] = InputLayer((None, 1, img_rows, img_cols),input_var=input_var)
+#     net['conv1/7x7_s2'] = ConvLayer(
+#         net['input'], 64, 7, stride=2, pad=3, flip_filters=False)
+#     net['pool1/3x3_s2'] = PoolLayer(
+#         net['conv1/7x7_s2'], pool_size=3, stride=2, ignore_border=False)
+#     net['pool1/norm1'] = LRNLayer(net['pool1/3x3_s2'], alpha=0.00002, k=1)
+#     net['conv2/3x3_reduce'] = ConvLayer(
+#         net['pool1/norm1'], 64, 1, flip_filters=False)
+#     net['conv2/3x3'] = ConvLayer(
+#         net['conv2/3x3_reduce'], 192, 3, pad=1, flip_filters=False)
+#     net['conv2/norm2'] = LRNLayer(net['conv2/3x3'], alpha=0.00002, k=1)
+#     net['pool2/3x3_s2'] = PoolLayer(
+#       net['conv2/norm2'], pool_size=3, stride=2, ignore_border=False)
 
-    net.update(build_inception_module('inception_3a',
-                                      net['pool2/3x3_s2'],
-                                      [32, 64, 96, 128, 16, 32]))
-    net.update(build_inception_module('inception_3b',
-                                      net['inception_3a/output'],
-                                      [64, 128, 128, 192, 32, 96]))
-    net['pool3/3x3_s2'] = PoolLayer(
-      net['inception_3b/output'], pool_size=3, stride=2, ignore_border=False)
+#     net.update(build_inception_module('inception_3a',
+#                                       net['pool2/3x3_s2'],
+#                                       [32, 64, 96, 128, 16, 32]))
+#     net.update(build_inception_module('inception_3b',
+#                                       net['inception_3a/output'],
+#                                       [64, 128, 128, 192, 32, 96]))
+#     net['pool3/3x3_s2'] = PoolLayer(
+#       net['inception_3b/output'], pool_size=3, stride=2, ignore_border=False)
 
-    net.update(build_inception_module('inception_4a',
-                                      net['pool3/3x3_s2'],
-                                      [64, 192, 96, 208, 16, 48]))
-    net.update(build_inception_module('inception_4b',
-                                      net['inception_4a/output'],
-                                      [64, 160, 112, 224, 24, 64]))
-    net.update(build_inception_module('inception_4c',
-                                      net['inception_4b/output'],
-                                      [64, 128, 128, 256, 24, 64]))
-    net.update(build_inception_module('inception_4d',
-                                      net['inception_4c/output'],
-                                      [64, 112, 144, 288, 32, 64]))
-    net.update(build_inception_module('inception_4e',
-                                      net['inception_4d/output'],
-                                      [128, 256, 160, 320, 32, 128]))
-    net['pool4/3x3_s2'] = PoolLayer(
-      net['inception_4e/output'], pool_size=3, stride=2, ignore_border=False)
+#     net.update(build_inception_module('inception_4a',
+#                                       net['pool3/3x3_s2'],
+#                                       [64, 192, 96, 208, 16, 48]))
+#     net.update(build_inception_module('inception_4b',
+#                                       net['inception_4a/output'],
+#                                       [64, 160, 112, 224, 24, 64]))
+#     net.update(build_inception_module('inception_4c',
+#                                       net['inception_4b/output'],
+#                                       [64, 128, 128, 256, 24, 64]))
+#     net.update(build_inception_module('inception_4d',
+#                                       net['inception_4c/output'],
+#                                       [64, 112, 144, 288, 32, 64]))
+#     net.update(build_inception_module('inception_4e',
+#                                       net['inception_4d/output'],
+#                                       [128, 256, 160, 320, 32, 128]))
+#     net['pool4/3x3_s2'] = PoolLayer(
+#       net['inception_4e/output'], pool_size=3, stride=2, ignore_border=False)
 
-    net.update(build_inception_module('inception_5a',
-                                      net['pool4/3x3_s2'],
-                                      [128, 256, 160, 320, 32, 128]))
-    net.update(build_inception_module('inception_5b',
-                                      net['inception_5a/output'],
-                                      [128, 384, 192, 384, 48, 128]))
+#     net.update(build_inception_module('inception_5a',
+#                                       net['pool4/3x3_s2'],
+#                                       [128, 256, 160, 320, 32, 128]))
+#     net.update(build_inception_module('inception_5b',
+#                                       net['inception_5a/output'],
+#                                       [128, 384, 192, 384, 48, 128]))
 
-    net['pool5/7x7_s1'] = GlobalPoolLayer(net['inception_5b/output'])
-    net['dropout/40%'] = DropoutLayer(net['pool5/7x7_s1'],p=0.4)
-    net['loss3/classifier'] = DenseLayer(net['dropout/40%'],
-                                         num_units=1000,
-                                         nonlinearity=linear)
-    output = DenseLayer(net['loss3/classifier'],num_units=1,nonlinearity = sigmoid)
+#     net['pool5/7x7_s1'] = GlobalPoolLayer(net['inception_5b/output'])
+#     net['dropout/40%'] = DropoutLayer(net['pool5/7x7_s1'],p=0.4)
+#     net['loss3/classifier'] = DenseLayer(net['dropout/40%'],
+#                                          num_units=1000,
+#                                          nonlinearity=linear)
+#     output = DenseLayer(net['loss3/classifier'],num_units=1,nonlinearity = sigmoid)
 
-    return output
+#     return output
 
 
 def fcn(input_var=None):
@@ -337,31 +337,31 @@ def test(imgs):
     with np.load('forum_model.npz') as f:
        param_values = [f['arr_%d' % i] for i in range(len(f.files))]
 
-    with np.load('forum_model_yn.npz') as g:
-       yn_param_values = [g['arr_%d' % i] for i in range(len(g.files))]
+    #with np.load('forum_model_yn.npz') as g:
+     #  yn_param_values = [g['arr_%d' % i] for i in range(len(g.files))]
 
 #    print param_values
     lasagne.layers.set_all_param_values(network, param_values)
-    lasagne.layers.set_all_param_values(yn_network, yn_param_values)
+    #lasagne.layers.set_all_param_values(yn_network, yn_param_values)
 
     #Setup prediction variable
     test_prediction = lasagne.layers.get_output(network, deterministic=True)
-    test_nerve_presence_prediction = lasagne.layers.get_output(yn_network, deterministic=True)
+    #test_nerve_presence_prediction = lasagne.layers.get_output(yn_network, deterministic=True)
 
     #Setup test function
     get_output = theano.function([input_var],test_prediction)
-    get_m_pres_output = theano.function([input_var],test_nerve_presence_prediction)
+    #get_m_pres_output = theano.function([input_var],test_nerve_presence_prediction)
 
 
     #Compute output of the test  examples
     pred  = get_output(X_test)
-    presence_prediction = get_m_pres_output(X_test)
+    #presence_prediction = get_m_pres_output(X_test)
 
     #Compute RLE for the predicted masks and add it to  the list of rle masks
     i = 0
     resizedimages = np.empty((pred.shape[0],420,580))
     for img in pred:
-        resizedimages[i] = postprocess(img[0] , presence_prediction[i])
+        resizedimages[i] = postprocess(img[0] , None)
     #    resizedimages[i] = img[0] 
         i = i+1
 
@@ -396,7 +396,7 @@ def write_submission_file(num_images):
     indx = np.arange(num_images) + 1
     print("Writing Submission file ...")
     dframe = pd.DataFrame({"img": indx, "pixels":rle_mask})
-    dframe.to_csv("segnet_pres.csv", index=False)
+    dframe.to_csv("segnet_only_10.csv", index=False)
 
     
 if __name__== "__main__":

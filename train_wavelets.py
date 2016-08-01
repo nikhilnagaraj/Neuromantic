@@ -352,7 +352,7 @@ def train():
     img_masks /= 255.
 
     #Split into training and validation data
-    val_patients = 5
+    val_patients = 17
 
     X_train, X_val = imgs[:-(val_patients*num_images)], imgs[-(val_patients*num_images):] 
     y_train, y_val = img_masks[:-(val_patients*num_images)], img_masks[-(val_patients*num_images):]
@@ -430,7 +430,7 @@ def train():
     val_pres_fn = theano.function([input_var, mask_presence_var], mask_pres_loss)
     
 
-    num_epochs=40
+    num_epochs=100
     train_batchsize=32
     val_batchsize = 32
     best_mask_val_score = 99.99
@@ -472,7 +472,7 @@ def train():
        
         #mask_pres_lr = theano.shared(1e-5/(2**(epoch+1)))
 
-        np.savez('forum_model.npz',*lasagne.layers.get_all_param_values(network))
+        np.savez('wavelet_model.npz',*lasagne.layers.get_all_param_values(network))
         print("Saved the model after the {}th epoch".format(epoch+1))
 
         if(best_mask_val_score/1.05 > val_mask_pres/val_batches): 
